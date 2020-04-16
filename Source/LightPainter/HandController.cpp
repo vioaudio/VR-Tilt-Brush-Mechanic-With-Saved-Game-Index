@@ -2,6 +2,7 @@
 
 
 #include "HandController.h"
+#include "Engine/World.h"
 
 // Sets default values
 AHandController::AHandController()
@@ -15,17 +16,29 @@ AHandController::AHandController()
 		MotionController->SetShowDeviceModel(true); //Automatically knows which Model Device your using and which hand
 }
 
-// Called when the game starts or when spawned
 void AHandController::BeginPlay()
 {
 	Super::BeginPlay();
-	
+}
+
+void AHandController::Draw()
+{
+	CurrentStroke = GetWorld()->SpawnActor<AStroke>(StrokeClass);
+	CurrentStroke->SetActorLocation(GetActorLocation());
+}
+
+void AHandController::DrawStop()
+{
+	CurrentStroke = nullptr;
 }
 
 // Called every frame
 void AHandController::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	if (CurrentStroke)
+	{
+		CurrentStroke->Update(GetActorLocation());
+	}
 }
 

@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Camera/CameraComponent.h"
+#include "HandController.h"
 #include "VRPawn.generated.h"
 
 UCLASS()
@@ -20,11 +21,18 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
 private:
+	void RightTriggerPressed() { if (RightController) RightController->Draw(); }
+	void RightTriggerReleased() { if (RightController) RightController->DrawStop(); }
+
+	void Save();
+	void Load();
 
 	//Config
 	UPROPERTY(EditDefaultsOnly) //Dont want to edit after play start
-		TSubclassOf<class AHandController> HandControllerClass;
+		TSubclassOf<AHandController> HandControllerClass;
 
 	//Components
 	UPROPERTY(VisibleAnywhere)

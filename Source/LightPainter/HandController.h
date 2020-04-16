@@ -5,7 +5,10 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "MotionControllerComponent.h"
+#include "Stroke.h"
 #include "HandController.generated.h"
+
+
 
 UCLASS()
 class LIGHTPAINTER_API AHandController : public AActor
@@ -15,6 +18,9 @@ class LIGHTPAINTER_API AHandController : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AHandController();
+
+	void Draw();
+	void DrawStop();
 
 protected:
 	// Called when the game starts or when spawned
@@ -28,4 +34,12 @@ private:
 	//Commponents
 	UPROPERTY(VisibleAnywhere)
 		UMotionControllerComponent* MotionController;
+
+	//State
+		AStroke* CurrentStroke;
+
+	//Config
+	UPROPERTY(EditDefaultsOnly) //Dont want to edit after play start
+		TSubclassOf<AStroke> StrokeClass;
+
 };
