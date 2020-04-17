@@ -3,6 +3,7 @@
 
 #include "Stroke.h"
 #include "Components/SplineMeshComponent.h"
+#include "Engine/World.h"
 
 // Sets default values
 AStroke::AStroke()
@@ -58,6 +59,8 @@ FVector AStroke::GetNextSegmentScale(FVector CurrentLocation) const
 
 void AStroke::Update(FVector CursorLocation) //When drawing Cursor Location is the Location of the Controller of that frame
 {
+	ControlPoints.Add(CursorLocation);
+
 	if (PreviousCursorLocation.IsNearlyZero()) //So the first point doesn't start at (0,0,0)
 	{
 		PreviousCursorLocation = CursorLocation;
@@ -77,6 +80,24 @@ void AStroke::Update(FVector CursorLocation) //When drawing Cursor Location is t
 	Spline->SetStartAndEnd(StartPos, StartTangent, EndPos, EndTangent); //Sets paramaeters of spline
 
 	PreviousCursorLocation = CursorLocation; //Used as end position in Next frame while drawing*/
+}
+
+FStrokeState AStroke::SerializeToStruct() const //tell me what you are interested in saving
+{
+	FStrokeState StrokeState;
+	StrokeState.Class = GetClass(); //Gets the blueprint class of this stroke
+	StrokeState.ControlPoints = ControlPoints;
+	return StrokeState;
+}
+
+AStroke* AStroke::SpawnAndDeserializeFromStruct(UWorld* World, const FStrokeState& StrokeState)
+{
+	AStroke* Stroke = World->SpawnActor<AStroke>(StrokeState.Class); //Spawns the correct class
+	for (FVector ControlPoint : StrokeState.ControlPoints)
+	{
+		Stroke->Update(ControlPoint); //replays what we stored
+	}
+	return Stroke;
 }
 
 /*USplineMeshComponent* AStroke::CreateSplineMesh()

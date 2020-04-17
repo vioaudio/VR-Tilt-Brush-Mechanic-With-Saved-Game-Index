@@ -4,7 +4,7 @@
 #include "Engine/World.h"
 #include "HandController.h"
 #include "Components/InputComponent.h"
-#include "Saving/PainterSaveGame.h"
+#include "LightPainterSaveGame.h"
 
 AVRPawn::AVRPawn()
 {
@@ -35,12 +35,12 @@ void AVRPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAction(TEXT("Draw"), EInputEvent::IE_Pressed, this, &AVRPawn::RightTriggerPressed);
 	PlayerInputComponent->BindAction(TEXT("Draw"), EInputEvent::IE_Released, this, &AVRPawn::RightTriggerReleased);
 	PlayerInputComponent->BindAction(TEXT("Save"), EInputEvent::IE_Released, this, &AVRPawn::Save);
-	PlayerInputComponent->BindAction(TEXT("Save"), EInputEvent::IE_Released, this, &AVRPawn::Load);
+	PlayerInputComponent->BindAction(TEXT("Load"), EInputEvent::IE_Released, this, &AVRPawn::Load);
 }
 
 void AVRPawn::Save()
 {
-	UPainterSaveGame* Painting = UPainterSaveGame::Create(); //Static so needs to be called from the class itself
+	ULightPainterSaveGame* Painting = ULightPainterSaveGame::Create(); //Static so needs to be called from the class itself
 	Painting->SetState("Hello World");
 	Painting->SerializeFromWorld(GetWorld());
 	Painting->Save();
@@ -48,7 +48,7 @@ void AVRPawn::Save()
 
 void AVRPawn::Load()
 {
-	UPainterSaveGame* Painting = UPainterSaveGame::Load();
+	ULightPainterSaveGame* Painting = ULightPainterSaveGame::Load();
 	if (Painting)
 	{
 		Painting->DeserializeFromWorld(GetWorld());

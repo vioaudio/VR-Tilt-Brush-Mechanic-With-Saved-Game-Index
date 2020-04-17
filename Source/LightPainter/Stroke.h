@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "Components/SplineMeshComponent.h"
 #include "Components/InstancedStaticMeshComponent.h"
+#include "LightPainterSaveGame.h"
 #include "Stroke.generated.h"
 
 UCLASS()
@@ -18,6 +19,9 @@ public:
 
 	UFUNCTION()
 	void Update(FVector CursorLocation);
+
+	FStrokeState SerializeToStruct() const; //Serialization Struct Method that can be used in the Save Game class, FStrokeState comes from the save game
+	static AStroke* SpawnAndDeserializeFromStruct(UWorld* World, const FStrokeState& StrokeState); //Ref becaused FStrokeState could potentially be very large
 
 private:
 
@@ -41,4 +45,5 @@ private:
 
 	//State
 	FVector PreviousCursorLocation;
+	TArray<FVector> ControlPoints; //stores all the control points that will be passed int othe struct, add to in Update
 };

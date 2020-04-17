@@ -1,12 +1,12 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "PainterSaveGame.h"
+#include "LightPainterSaveGame.h"
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
 #include "Stroke.h"
 
-/*void UPainterSaveGame::Clearworld(UWorld* World)
+void ULightPainterSaveGame::ClearWorld(UWorld* World)
 {
 	for (TActorIterator<AStroke> StrokeIterator(World); StrokeIterator; ++StrokeIterator)
 	{
@@ -14,43 +14,44 @@
 	}
 }
 
-UPainterSaveGame* UPainterSaveGame::Create()
+ULightPainterSaveGame* ULightPainterSaveGame::Create()
 {
 	USaveGame* NewSaveGame = UGameplayStatics::CreateSaveGameObject(StaticClass()); //Static class function retruns "this" class types
 
-	return Cast<UPainterSaveGame>(NewSaveGame); //Cast to change it to proper return type
+	return Cast<ULightPainterSaveGame>(NewSaveGame); //Cast to change it to proper return type
 }
 
-void UPainterSaveGame::DeserializeFromWorld(UWorld* World)
+void ULightPainterSaveGame::DeserializeFromWorld(UWorld* World)
 {
 	//clear the world
+	ClearWorld(World);
 
 	//For all strokes, spawn a stroke of that type
+	for (FStrokeState StrokeState : Strokes)
+	{
+		AStroke::SpawnAndDeserializeFromStruct(World, StrokeState); //Creates the struct
+	}	
 }
 
-
-UPainterSaveGame* UPainterSaveGame::Load()
+ULightPainterSaveGame* ULightPainterSaveGame::Load()
 {
 	USaveGame* LoadSaveGame = UGameplayStatics::LoadGameFromSlot(TEXT("Test"), 0);
-	return  Cast<UPainterSaveGame>(LoadSaveGame);
+	return  Cast<ULightPainterSaveGame>(LoadSaveGame);
 }
 
-bool UPainterSaveGame::Save()
+bool ULightPainterSaveGame::Save()
 {
 	return UGameplayStatics::SaveGameToSlot(this, TEXT("Test"), 0); //Creates Save Slot
 }
 
-void UPainterSaveGame::SerializeFromWorld(UWorld* World)
+void ULightPainterSaveGame::SerializeFromWorld(UWorld* World)
 {
 	//clear the array
 	Strokes.Empty();
 	//iterate over all stroke and serialize them
 	for (TActorIterator<AStroke> StrokeIterator(World); StrokeIterator; ++StrokeIterator) //TActorIterator Bass class is a template class used to filter actors by certain characteristics
 	{
-		Strokes.Add(StrokeIterator->GetClass()); //get class of stroke and passes it into array so you get the correct blueprint class
+		Strokes.Add(StrokeIterator->SerializeToStruct()); //Returns the state of the stroke
 	}
 	//Store the class type in the array
-}*/
-
-
-
+}
