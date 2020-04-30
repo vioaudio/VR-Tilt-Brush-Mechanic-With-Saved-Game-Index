@@ -4,23 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "MotionControllerComponent.h"
 #include "Stroke.h"
-#include "HandController.generated.h"
+#include "HandControllerBase.h"
+#include "PaintBrushHandController.generated.h"
 
 
 
 UCLASS()
-class LIGHTPAINTER_API AHandController : public AActor
+class LIGHTPAINTER_API APaintBrushHandController : public AHandControllerBase
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AHandController();
+	APaintBrushHandController();
 
-	void Draw();
-	void DrawStop();
+	void Draw() override; //override is just a safeguard, because it will fail if you don't override something in the base class
+	void DrawStop() override;
 
 protected:
 	// Called when the game starts or when spawned
@@ -31,9 +31,7 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
-	//Commponents
-	UPROPERTY(VisibleAnywhere)
-		UMotionControllerComponent* MotionController;
+	
 
 	//State
 		AStroke* CurrentStroke;

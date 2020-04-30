@@ -4,6 +4,8 @@
 #include "LightPainterSaveGame.h"
 #include "EngineUtils.h"
 #include "Kismet/GameplayStatics.h"
+#include "Misc/Guid.h"
+#include "PainterSaveGameIndex.h"
 #include "Stroke.h"
 
 void ULightPainterSaveGame::ClearWorld(UWorld* World)
@@ -15,10 +17,17 @@ void ULightPainterSaveGame::ClearWorld(UWorld* World)
 }
 
 ULightPainterSaveGame* ULightPainterSaveGame::Create()
-{
-	USaveGame* NewSaveGame = UGameplayStatics::CreateSaveGameObject(StaticClass()); //Static class function retruns "this" class types
 
-	return Cast<ULightPainterSaveGame>(NewSaveGame); //Cast to change it to proper return type
+{
+	//Static class function retruns "this" class type, Cast is to change it to proper return type  because create save game object will be of type USaveGame
+	ULightPainterSaveGame* NewSaveGame = Cast<ULightPainterSaveGame>(UGameplayStatics::CreateSaveGameObject(StaticClass()));
+	NewSaveGame->SlotName = FGuid::NewGuid().ToString();
+	if (!NewSaveGame->Save()) return nullptr; //makes sure it saves so you don't add to index and later forget to save it
+
+	UPainterSaveGameIndex* Index = UPainterSaveGameIndex::Load();// Load the index
+	Index->AddSlotName(NewSaveGame);
+	Index->Save();
+	return NewSaveGame; 
 }
 
 void ULightPainterSaveGame::DeserializeFromWorld(UWorld* World)
@@ -33,17 +42,16 @@ void ULightPainterSaveGame::DeserializeFromWorld(UWorld* World)
 	}	
 }
 
-ULightPainterSaveGame* ULightPainterSaveGame::Load()
+ULightPainterSaveGame* ULightPainterSaveGame::Load(FString SlotName) //SlotName doesn't simply work in Load because it is static and doesn't have access to instanced variables yet when called
 {
-	USaveGame* LoadSaveGame = UGameplayStatics::LoadGameFromSlot(TEXT("Test"), 0);
+	USaveGame* LoadSaveGame = UGameplayStatics::LoadGameFromSlot(SlotName, 0);
 	return  Cast<ULightPainterSaveGame>(LoadSaveGame);
 }
 
 bool ULightPainterSaveGame::Save()
 {
-	return UGameplayStatics::SaveGameToSlot(this, TEXT("Test"), 0); //Creates Save Slot
+	return UGameplayStatics::SaveGameToSlot(this, SlotName, 0); //Creates Save Slot
 }
-
 void ULightPainterSaveGame::SerializeFromWorld(UWorld* World)
 {
 	//clear the array

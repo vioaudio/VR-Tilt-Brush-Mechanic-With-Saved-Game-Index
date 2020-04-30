@@ -37,7 +37,7 @@ public:
 	//rather we need to get a hold of UPainterSaveGame
 	static ULightPainterSaveGame* Create();
 
-	static ULightPainterSaveGame* Load();//Static because we want to get a UPainterSaveGame Out of it, which means we don't have one yet
+	static ULightPainterSaveGame* Load(FString SlotName);//Static because we want to get a UPainterSaveGame Out of it, which means we don't have one yet
 
 	bool Save(); //not static because used on the instance itself when it asks "have we successfully saved" when calling the SaveGameToSlot function
 
@@ -47,12 +47,18 @@ public:
 	void SerializeFromWorld(UWorld* World); //takes the current state of the world and put it into the Save Game Class
 	void DeserializeFromWorld(UWorld* World); //take world from save game and put it into the world
 
+	FString GetSlotName() const { return SlotName; } //Getter for the GUID
+
 private:
 	void ClearWorld(UWorld* World);
 
 	//State
 	UPROPERTY()
 		FString State; //Property that will be populated
+
+	UPROPERTY()
+		FString SlotName;
+
 	UPROPERTY()
 		//Property to Store the strokes, need the type of stroke, which means you need access to the Blueprint or subclass
 		TArray<FStrokeState> Strokes; //Will be used to capture the state of the world and put it back into the world

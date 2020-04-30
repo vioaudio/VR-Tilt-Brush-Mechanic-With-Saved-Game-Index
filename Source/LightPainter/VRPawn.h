@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Pawn.h"
 #include "Camera/CameraComponent.h"
-#include "HandController.h"
+#include "HandControllerBase.h"
 #include "VRPawn.generated.h"
 
 UCLASS()
@@ -26,22 +26,32 @@ protected:
 private:
 	void RightTriggerPressed() { if (RightController) RightController->Draw(); }
 	void RightTriggerReleased() { if (RightController) RightController->DrawStop(); }
-
+	void PaginateRight(float AxisValue);
+	void UpdateCurrentPage(int32 Offset);
 	void Save();
-	void Load();
 
 	//Config
 	UPROPERTY(EditDefaultsOnly) //Dont want to edit after play start
-		TSubclassOf<AHandController> HandControllerClass;
+		TSubclassOf<AHandControllerBase> RightHandControllerClass;
+	UPROPERTY(EditDefaultsOnly) //Dont want to edit after play start
+		TSubclassOf<AHandControllerBase> LeftHandControllerClass;
+	UPROPERTY(EditDefaultsOnly)
+		float PaginationThumbstickThreshold = 0.9;
 
 	//Components
 	UPROPERTY(VisibleAnywhere)
 		USceneComponent* VRRoot;
+
 	UPROPERTY(VisibleAnywhere)
 		UCameraComponent* Camera;
 
 	//References
 	UPROPERTY()
-		AHandController* RightController;
+		AHandControllerBase* RightController;
 
+	UPROPERTY()
+		AHandControllerBase* LeftController;
+
+	//State
+	int32 LastPaginationOffset = 0;
 };
